@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:head>
+	  <!-- For Bootstrap responsive grid -->
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+	</h:head>
+	
+	<h:body>
+
+		<f:metadata>
+			<f:viewAction action="#{mpPagamentoController.inicializar}" />
+		</f:metadata>
+
+		<h:form id="frmPR">
+			<p:panel header="Cadastro de #{mpPagamentoController.txtTitulo} - Contrato : #{mpPagamentoController.mpContrato.getNumeroId()}" 
+				closable="false" style="width:90%">
+				<p:ajax event="close" listener="#{mpPagamentoController.mpFechar}" />
+
+					<p:tabView id="tabvPR">
+
+						<p:tab  id="tabPesqPR" title="Pesquisa">
+
+							<div class="container">
+								<p:dataTable id="dttPesqCC" var="mpPagamento" widgetVar="wvdttPesqCC" 
+									value="#{mpPagamentoController.mpPagamentoList}"
+									emptyMessage="Nenhum #{mpPagamentoController.txtTitulo}... encontrada!"
+									filteredValue="#{mpPagamentoController.filtroMpPagamentoList}"
+									paginator="true" paginatorAlwaysVisible="false"
+									paginatorPosition="bottom" rows="10">
+
+									<p:column headerText="Ação" style="text-align:center">
+										<p:commandButton title="Seleciona registro" icon="ui-icon-check"
+											action="#{mpPagamentoController.mpView}"
+											process="@this" update="@form"
+											actionListener="#{mpPagamentoController.mpListener}">
+											<f:attribute name="PagamentoSelecionado" value="#{mpPagamento}" />
+										</p:commandButton>
+										<p:commandButton title="Exclui registro" icon="ui-icon-trash"
+											oncomplete="PF('confirmacaoExclusaoR').show()"
+											process="@this"
+											update=":frmPR:tabvPR:confirmacaoExclusaoDialogR"
+											actionListener="#{mpPagamentoController.mpListener}">
+											<f:attribute name="PagamentoSelecionado" value="#{mpPagamento}" />
+										</p:commandButton>
+									</p:column>
+
+									<p:column headerText="Data" sortBy="#{mpPagamento.dataMovimento}"
+										filterBy="#{mpPagamento.dataMovimento}" filterMatchMode="contains">
+										<h:outputText value="#{mpPagamento.dataMovimento}">
+											<f:convertDateTime pattern="dd/MM/yyyy"
+												timeZone="America/Sao_Paulo" />
+										</h:outputText>
+									</p:column>
+									<p:column headerText="Tipo" 
+										sortBy="#{mpPagamento.mpPagamentoTipo.descricao}"
+										filterBy="#{mpPagamento.mpPagamentoTipo.descricao}" filterMatchMode="contains">
+										<h:outputText value="#{mpPagamento.mpPagamentoTipo.descricao}" />
+									</p:column>
+									<p:column headerText="Status" 
+										sortBy="#{mpPagamento.mpPagamentoStatus.descricao}"
+										filterBy="#{mpPagamento.mpPagementoStatus.descricao}" filterMatchMode="contains">
+										<h:outputText value="#{mpPagamento.mpPagamentoStatus.descricao}" />
+									</p:column>
+									<p:column headerText="Valor" 
+										sortBy="#{mpPagamento.valor}"
+										filterBy="#{mpPagamento.valor}" filterMatchMode="contains">
+										<h:outputText value="#{mpPagamento.valor}" />
+									</p:column>
+
+								</p:dataTable>
+							</div>
+
+						</p:tab>
+
+						<p:tab title="Informações do Cadastro">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+
+							<div class="row">
+								<div class="col-md-9">
+									<p:messages id="message" autoUpdate="false" showDetail="false" />
+								</div>
+							</div>
+
+							<p:panel header=". Modo: #{mpPagamentoController.txtModoTela}">
+								<f:facet name="actions">
+									<ui:include src="mpBotoesPagamento.xhtml" />
+								</f:facet>
+
+								<p:tabView id="tabvCadPR">
+
+									<p:tab id="tabCadDadosPR" title="Dados">
+									
+    									<p:panelGrid columns="5" 
+    										columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-2,ui-grid-col-1" 
+    										layout="grid" styleClass="ui-panelgrid-blank">
+
+											<h:panelGroup id="pgDataD">
+												<h:panelGroup id="pgDataD1"
+													rendered="#{mpPagamentoController.indEditavel}">
+													<p:outputLabel value="Data : " />
+													<p:inputText style="color:red; width:80%" placeholder="__/__/____"
+														value="#{mpPagamentoController.mpPagamento.dataMovimento}"
+														readonly="true">
+														<f:convertDateTime pattern="dd/MM/yyyy"
+															timeZone="America/Sao_Paulo" />
+													</p:inputText>
+												</h:panelGroup>
+												<h:panelGroup id="pgDataD2"
+													rendered="#{!mpPagamentoController.indEditavel}">
+													<p:outputLabel for="dataMovimento" value="Data : " />
+													<p:calendar id="dataMovimento" showOn="button" style="width:80%"
+														required="#{!mpPagamentoController.indEditavel}"
+														validatorMessage="Informar DATA"
+														timeZone="America/Sao_Paulo" pattern="dd/MM/yyyy" mask="true"
+														locale="pt" placeholder="__/__/____"
+														value="#{mpPagamentoController.mpPagamento.dataMovimento}" />
+													<p:message for="dataMovimento" display="icon" />
+												</h:panelGroup>
+											</h:panelGroup>
+											
+											<h:panelGroup id="pgMpPagamentoTipo">
+												<p:outputLabel value="Tipo: " />
+												<p:selectOneMenu id="mpPagamentoTipo" effect="fold"
+													converter="omnifaces.SelectItemsConverter"
+													required="#{mpPagamentoController.indEditavel}"
+													validatorMessage="Informar Tipo"
+													disabled="#{mpPagamentoController.indEditavel}"
+													value="#{mpPagamentoController.mpPagamento.mpPagamentoTipo}">
+													<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+													<f:selectItems
+														value="#{mpPagamentoController.mpPagamentoTipoList}"
+														var="mpPagamentoTipo" itemLabel="#{mpPagamentoTipo.descricao}"
+														itemValue="#{mpPagamentoTipo}" />
+												</p:selectOneMenu>
+											</h:panelGroup>
+											
+											<h:panelGroup id="pgMpPagamentoStatus">
+												<p:outputLabel value="Status: " />
+												<p:selectOneMenu id="mpPagamentoStatus" effect="fold"
+													converter="omnifaces.SelectItemsConverter"
+													required="#{mpPagamentoController.indEditavel}"
+													validatorMessage="Informar Status"
+													disabled="#{mpPagamentoController.indEditavel}"
+													value="#{mpPagamentoController.mpPagamento.mpPagamentoStatus}">
+													<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+													<f:selectItems
+														value="#{mpPagamentoController.mpPagamentoStatusList}"
+														var="mpPagamentoStatus" itemLabel="#{mpPagamentoStatus.descricao}"
+														itemValue="#{mpPagamentoStatus}" />
+												</p:selectOneMenu>
+											</h:panelGroup>
+											
+											<h:panelGroup id="pgValor">
+												<p:outputLabel value="Valor: " />
+												<p:inputText id="valor" placeholder="" maxlength="10"
+												 	styleClass="moeda" required="#{mpPagamentoController.indEditavel}"
+													validatorMessage="Informar Valor"
+													readonly="#{mpPagamentoController.indEditavel}"
+													value="#{mpPagamentoController.mpPagamento.valor}">
+													<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+												</p:inputText>
+											</h:panelGroup>
+
+										</p:panelGrid>
+									</p:tab>
+
+								</p:tabView>
+
+							</p:panel>
+						</p:tab>
+						
+					</p:tabView>
+			</p:panel>
+							
+		</h:form>
+		
+		<script type="text/javascript">
+			PrimeFaces.locales['pt'] = {
+				closeText : 'Fechar',
+				prevText : 'Anterior',
+				nextText : 'Próximo',
+				currentText : 'Começo',
+				monthNames : [ 'Janeiro', 'Fevereiro', 'Março', 'Abril',
+						'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro',
+						'Outubro', 'Novembro', 'Dezembro' ],
+				monthNamesShort : [ 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+						'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Des' ],
+				dayNames : [ 'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta',
+						'Sexta', 'Sábado' ],
+				dayNamesShort : [ 'Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex',
+						'Sáb' ],
+				dayNamesMin : [ 'D', 'S', 'T', 'Q', 'Q', 'S', 'S' ],
+				weekHeader : 'Semana',
+				firstDay : 1,
+				isRTL : false,
+				showMonthAfterYear : false,
+				yearSuffix : '',
+				timeOnlyTitle : 'Só Horas',
+				timeText : 'Tempo',
+				hourText : 'Hora',
+				minuteText : 'Minuto',
+				secondText : 'Segundo',
+				currentText : 'Data Atual',
+				ampm : false,
+				month : 'Mês',
+				week : 'Semana',
+				day : 'Dia',
+				allDayText : 'Todo Dia'
+			};
+		</script>
+	
+	</h:body>
+			
+</html>

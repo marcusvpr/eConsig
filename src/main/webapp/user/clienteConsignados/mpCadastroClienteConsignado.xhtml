@@ -1,0 +1,1867 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template/mpLayout.xhtml">
+
+	<ui:define name="content">
+
+		<f:metadata>
+			<f:viewAction action="#{mpClienteConsignadoController.inicializar}" />
+		</f:metadata>
+
+<style type="text/css">   
+  .ui-datatable {
+      margin-bottom:20px;
+  }
+ 
+  .ui-datatable-frozenlayout-left {
+      width:20%;
+  }
+ 
+  .ui-datatable-frozenlayout-right {
+      width:80%;
+  }
+</style>
+
+		<h:form id="frmCC">
+			<p:growl id="growl" showDetail="true" sticky="true" />
+
+			<p:panel id="panCC" header="Cadastro de #{mpClienteConsignadoController.txtTitulo}"
+				closable="true" style="width:90%">
+				<p:ajax event="close" listener="#{mpClienteConsignadoController.mpFechar}" />
+
+				<p:tabView id="tabvCC">
+
+					<p:tab title="Informações do Cadastro">
+						<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+
+						<div class="row">
+							<div class="col-md-9">
+								<p:messages id="message" autoUpdate="false" showDetail="false" />
+							</div>
+						</div>
+
+						<p:panel id="panCadCC" footer=". Modo: #{mpClienteConsignadoController.txtModoTela}">
+							<f:facet name="header"> 
+								<ui:include src="mpBotoesClienteConsignado.xhtml" />
+							</f:facet>
+							<!-- f:facet name="actions">
+								<ui:include src="mpBotoesClienteConsignado.xhtml" />
+							</f:facet>  -->
+
+							<p:tabView id="tabvCadCC">
+
+								<p:tab id="tabCadDadosCC" title="Dados">
+
+								   <div class="ui-fluid">
+								   
+    								<p:panelGrid columns="6" columnClasses="ui-grid-col-4,ui-grid-col-1,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-1" 
+    									layout="grid" styleClass="ui-panelgrid-blank">
+										<h:panelGroup id="pgNome">
+											<p:outputLabel for="nome" value="Nome: " />
+											<p:inputText id="nome" placeholder="" maxlength="100" style="width:90%"
+												required="#{!mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar NOME"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.nome}">
+												<f:validateLength maximum="100" />
+												<p:clientValidator event="keyup" />
+											</p:inputText>
+											<p:message for="nome" display="icon" />
+										</h:panelGroup>
+
+										<h:panelGroup id="pgProspeccao">
+											<p:outputLabel value="Prospecção: " />
+											<p:selectBooleanCheckbox
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.indProspeccao}" />
+										</h:panelGroup>
+
+										<h:panelGroup id="pgCPF">
+											<p:outputLabel value="CPF: " />
+											<p:spacer width="20%" height="10" />
+											<p:inputMask id="cpf" placeholder="___.___.___-__" mask="999.999.999-99"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar CPF" size="14"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.cpf}" />
+										</h:panelGroup>
+
+										<h:panelGroup id="pgMpIndicacao">
+											<p:outputLabel value="Indicação: " />
+											<p:selectOneMenu id="mpIndicacao" effect="fold" style="width:80%"
+												converter="omnifaces.SelectItemsConverter"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Indicação"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.mpIndicacao}">
+												<f:selectItem itemLabel="Selecione..." itemValue="" />
+												<f:selectItems
+													value="#{mpClienteConsignadoController.mpIndicacaoList}"
+													var="mpIndicacao" itemLabel="#{mpIndicacao.descricao}"
+													itemValue="#{mpIndicacao}" />
+											</p:selectOneMenu>
+										</h:panelGroup>
+
+										<h:panelGroup id="pgDiscriminacao">
+											<p:outputLabel value="Discriminação: " />
+											<p:inputText id="discriminacao" placeholder="" style="width:70%"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Discriminação"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.discriminacao}" />
+										</h:panelGroup>
+
+										<h:panelGroup id="pgFoto">
+							 				<p:graphicImage style="width:20%"
+												rendered="#{mpClienteConsignadoController.mpClienteConsignado.fotoLink == null ? false : true}"
+												library="static" name="images/fotos/cliente_consignado_#{mpClienteConsignadoController.mpClienteConsignado.fotoLink}.jpeg" />
+        									<p:graphicImage library="static" name="images/userBlank.jpg" style="width:20%"
+												rendered="#{mpClienteConsignadoController.mpClienteConsignado.fotoLink == null ? true : false}" />
+											<p:commandButton title="Trata FOTO" icon="ui-icon-search" style="width:10%"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												oncomplete="PF('wvdlogCapturaCC').show()" process="@this" />
+										</h:panelGroup>
+									</p:panelGrid>					
+									
+    								<p:panelGrid columns="5" columnClasses="ui-grid-col-3,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-3" layout="grid"
+    									 styleClass="ui-panelgrid-blank">
+										<h:panelGroup id="pgTelefone">
+											<p:outputLabel value="Telefone(DDD): " />
+											<p:inputMask id="telefone" placeholder="(__) _____-____"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Telefone"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.telefone}" />
+										</h:panelGroup>
+										<h:panelGroup id="pgMpTipoTelefone">
+											<p:outputLabel value="Tipo: "  />
+											<p:selectOneMenu id="mpTipoTelefone" effect="fold"
+												converter="omnifaces.SelectItemsConverter"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Tipo"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.mpTipoTelefone}">
+												<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+												<f:selectItems value="#{mpClienteConsignadoController.mpTipoTelefoneList}"
+													var="mpTipoTelefone" itemLabel="#{mpTipoTelefone.descricao}"
+													itemValue="#{mpTipoTelefone}" />
+											</p:selectOneMenu>
+										</h:panelGroup>					
+										<h:panelGroup id="pgTelefone1">
+											<p:outputLabel value="Telefone(DDD): " />
+											<p:inputMask id="telefone1" placeholder="(__) _____-____"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Telefone"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.telefone1}" />
+										</h:panelGroup>
+										<h:panelGroup id="pgMpTipoTelefone1">
+											<p:outputLabel value="Tipo: "  />
+											<p:selectOneMenu id="mpTipoTelefone1" effect="fold"
+												converter="omnifaces.SelectItemsConverter"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Tipo"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.mpTipoTelefone1}">
+												<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+												<f:selectItems value="#{mpClienteConsignadoController.mpTipoTelefoneList}"
+													var="mpTipoTelefone1" itemLabel="#{mpTipoTelefone1.descricao}"
+													itemValue="#{mpTipoTelefone1}" />
+											</p:selectOneMenu>
+										</h:panelGroup>					
+										<h:panelGroup id="pgCelular">
+											<p:outputLabel value="Celular (WhatsApp / Envio): " />
+											<p:inputMask id="celular" placeholder="(__) _____-____"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Celular" style="width:70%"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.celular}" />
+											<p:spacer width="5%" height="10" />
+											<p:selectBooleanCheckbox
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.indWhatsapp}" />
+											<p:spacer width="3%" height="10" />
+											<p:outputLabel value=" / " />
+											<p:spacer width="3%" height="10" />
+											<p:selectBooleanCheckbox
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.indSendWhatsapp}" />												
+										</h:panelGroup>
+									</p:panelGrid>	
+										
+    								<p:panelGrid columns="5" columnClasses="ui-grid-col-4,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2" 
+    									layout="grid" styleClass="ui-panelgrid-blank">
+										<h:panelGroup id="pgNumeroIdentidade">
+											<p:outputLabel value="Identidade: " />
+											<p:spacer width="50%" height="10" />
+											<p:selectOneMenu id="mpTipoRg" effect="fold" style="width:30%"
+												converter="omnifaces.SelectItemsConverter"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Tipo Rg"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.mpTipoRg}">
+												<f:selectItem itemLabel="Selecione" itemValue="" />
+												<f:selectItems var="mpTipoRg" 
+													value="#{mpClienteConsignadoController.mpTipoRgList}"
+													itemLabel="#{mpTipoRg.descricao}"
+													itemValue="#{mpTipoRg}" />
+											</p:selectOneMenu>
+											<p:inputText id="numeroIdentidade" placeholder="" size="20"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Número Identidade"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.identidade}" />
+										</h:panelGroup>
+										<h:panelGroup id="pgMpOrgaoEmissor">
+											<p:outputLabel value="Orgão Emissor: " />
+											<p:selectOneMenu id="mpOrgaoEmissor" effect="fold" style="width:70%"
+												converter="omnifaces.SelectItemsConverter"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar Orgão Emissor"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.mpOrgaoEmissor}">
+												<f:selectItem itemLabel="Selecione..." itemValue="" />
+												<f:selectItems var="mpOrgaoEmissor" 
+													value="#{mpClienteConsignadoController.mpOrgaoEmissorList}"
+													itemLabel="#{mpOrgaoEmissor.descricao}"
+													itemValue="#{mpOrgaoEmissor}" />
+											</p:selectOneMenu>
+										</h:panelGroup>
+										<h:panelGroup id="pgDataEmissao">
+											<p:outputLabel value="Data Emissão: " />
+											<p:calendar id="dataEmissao" pattern="dd/MM/yyyy" mask="true"
+												locale="pt" timeZone="America/Sao_Paulo" style="width:50%"								
+												placeholder="__/__/____" effect="fold" size="10"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.dataEmissao}" />
+										</h:panelGroup>
+										<h:panelGroup id="pgMpEstadoUFIdent">
+											<p:outputLabel value="UF Identidade: " />
+											<p:selectOneMenu id="mpEstadoUFIdent" effect="fold" style="width:50%"
+												required="#{mpClienteConsignadoController.indEditavel}"
+												validatorMessage="Informar a UF Identidade"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.mpEstadoUFIdent}">
+												<f:selectItem itemLabel="Selecione" />
+												<f:selectItems
+													value="#{mpClienteConsignadoController.mpEstadoUFList}"
+													var="mpEstadoUFIdent"
+													itemLabel="#{mpEstadoUFIdent}"
+													itemValue="#{mpEstadoUFIdent}" />
+											</p:selectOneMenu>
+										</h:panelGroup>
+										<h:panelGroup id="pgDataNascimento">
+											<p:outputLabel value="Dt.Nasc./Idade: " />
+											<p:calendar id="dataNascimento" pattern="dd/MM/yyyy" mask="true"
+												locale="pt" timeZone="America/Sao_Paulo" size="10"								
+												placeholder="__/__/____" effect="fold"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.dataNascimento}">
+												<p:ajax listener="#{mpClienteConsignadoController.handleChangeDataNascimento}"
+															update="idade" />
+											</p:calendar>
+											<p:outputLabel value=" / " />
+											<p:inputText id="idade" value="#{mpClienteConsignadoController.idade}" 
+												style="color:red; font-weight:bold;" readonly="true" size="3" />
+										</h:panelGroup>
+
+										<h:panelGroup id="pgNumeroIdentidade1">
+											<p:selectOneMenu id="mpTipoRg1" effect="fold" style="width:30%"
+												converter="omnifaces.SelectItemsConverter"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.mpTipoRg1}">
+												<f:selectItem itemLabel="Selecione" itemValue="" />
+												<f:selectItems var="mpTipoRg" 
+													value="#{mpClienteConsignadoController.mpTipoRgList}"
+													itemLabel="#{mpTipoRg.descricao}"
+													itemValue="#{mpTipoRg}" />
+											</p:selectOneMenu>
+											<p:inputText id="numeroIdentidade1" placeholder="" size="20"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.identidade1}" />
+										</h:panelGroup>
+										<h:panelGroup id="pgMpOrgaoEmissor1">
+											<p:selectOneMenu id="mpOrgaoEmissor1" effect="fold" style="width:70%"
+												converter="omnifaces.SelectItemsConverter"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.mpOrgaoEmissor1}">
+												<f:selectItem itemLabel="Selecione..." itemValue="" />
+												<f:selectItems var="mpOrgaoEmissor" 
+													value="#{mpClienteConsignadoController.mpOrgaoEmissorList}"
+													itemLabel="#{mpOrgaoEmissor.descricao}"
+													itemValue="#{mpOrgaoEmissor}" />
+											</p:selectOneMenu>
+										</h:panelGroup>
+										<h:panelGroup id="pgDataEmissao1">
+											<p:calendar id="dataEmissao1" pattern="dd/MM/yyyy" mask="true"
+												locale="pt" timeZone="America/Sao_Paulo" style="width:50%"								
+												placeholder="__/__/____" effect="fold" size="10"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.dataEmissao1}" />
+										</h:panelGroup>
+										<h:panelGroup id="pgMpEstadoUFIdent1">
+											<p:selectOneMenu id="mpEstadoUFIdent1" effect="fold" style="width:50%"
+												disabled="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.mpEstadoUFIdent1}">
+												<f:selectItem itemLabel="Selecione" />
+												<f:selectItems
+													value="#{mpClienteConsignadoController.mpEstadoUFList}"
+													var="mpEstadoUFIdent"
+													itemLabel="#{mpEstadoUFIdent}"
+													itemValue="#{mpEstadoUFIdent}" />
+											</p:selectOneMenu>
+										</h:panelGroup>
+										<h:panelGroup id="pgDataDesde">
+											<p:outputLabel value="Dt.Desde/Tempo: " />
+											<p:calendar id="dataDesde" pattern="dd/MM/yyyy" mask="true"
+												locale="pt" timeZone="America/Sao_Paulo" size="10"								
+												placeholder="__/__/____" effect="fold"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.dataDesde}">
+												<p:ajax listener="#{mpClienteConsignadoController.handleChangeDataDesde}"
+															update="tempoDesde" />
+											</p:calendar>
+											<p:outputLabel value=" / " />
+											<p:inputText id="tempoDesde" value="#{mpClienteConsignadoController.tempoDesde}" 
+												style="color:red; font-weight:bold;" readonly="true" size="3" />
+										</h:panelGroup>
+
+									</p:panelGrid>
+    								<p:panelGrid columns="1" columnClasses="ui-grid-col-12" layout="grid" styleClass="ui-panelgrid-blank">
+										<!-- p:panel id="horizontalEnd" header="Endereço :"
+											toggleable="true" toggleSpeed="500" collapsed="false" -->
+    										<p:panelGrid columns="4" columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3" 
+    											layout="grid" styleClass="ui-panelgrid-blank">
+    											
+												<h:panelGroup id="pgCEP">
+													<p:outputLabel value="CEP: " />
+													<p:spacer width="60%" height="10" />
+													<p:inputMask id="cep" placeholder="_____-___" mask="99999-999"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar CEP" size="9"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpEnderecoLocal.cep}">
+														<p:ajax listener="#{mpClienteConsignadoController.handleChangeCEP}"
+															update="logradouro bairro mpCidade mpEstadoUF :frmCC:tabvCC:message" />
+													</p:inputMask>
+												</h:panelGroup>
+    											    											
+												<h:panelGroup id="pgLogradouro">
+													<p:outputLabel value="Logradouro: " />
+													<p:inputText id="logradouro" placeholder=""
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar Logradouro"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpEnderecoLocal.logradouro}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgNumero">
+													<p:outputLabel value="Número: " />
+													<p:spacer width="60%" height="10" />
+													<p:inputText id="numero" placeholder="" size="5"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar Número"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpEnderecoLocal.numero}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgComplemento">
+													<p:outputLabel value="Complemento: " />
+													<p:spacer width="60%" height="10" />
+													<p:inputText id="complemento" placeholder="" size="15"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar Complemento"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpEnderecoLocal.complemento}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgBairro">
+													<p:outputLabel value="Bairro: " />
+													<p:inputText id="bairro" placeholder=""
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar Bairro"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpEnderecoLocal.bairro}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpCidade">
+													<p:outputLabel value="Cidade: " />
+													<p:selectOneMenu id="mpCidade" effect="fold"
+														converter="omnifaces.SelectItemsConverter"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar Cidade"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpEnderecoLocal.mpCidade}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems
+															value="#{mpClienteConsignadoController.mpCidadeList}"
+															var="mpCidade" itemLabel="#{mpCidade.descricao}"
+															itemValue="#{mpCidade}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpEstadoUF">
+													<p:outputLabel value="UF: " />
+													<p:spacer width="60%" height="10" />
+													<p:selectOneMenu id="mpEstadoUF" effect="fold" style="width:50%"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar a UF"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpEnderecoLocal.mpEstadoUF}">
+														<f:selectItem itemLabel="Selecione..." />
+														<f:selectItems
+															value="#{mpClienteConsignadoController.mpEstadoUFList}"
+															var="mpEstadoUF" itemLabel="#{mpEstadoUF}"
+															itemValue="#{mpEstadoUF}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgTempoResidencia">
+													<p:outputLabel value="Tempo Residência (Anos/Meses): " />
+													<p:inputText id="tempoResidenciaAnos" placeholder=""
+														maxlength="3" size="3" mask="999"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.tempoResidenciaAnos}" />
+													<p:inputText id="tempoResidenciaMeses" placeholder=""
+														maxlength="3" size="3" mask="99"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.tempoResidenciaMeses}" />
+												</h:panelGroup>
+											</p:panelGrid>
+										<!-- /p:panel>  -->
+									</p:panelGrid>
+
+    								<p:panelGrid columns="1" columnClasses="ui-grid-col-12" layout="grid" 
+    									styleClass="ui-panelgrid-blank">
+										<!-- p:panel id="horizontalComp" header="Complementos:"
+															toggleable="true" toggleSpeed="500" collapsed="false" -->
+												
+    										<p:panelGrid columns="5" columnClasses="ui-grid-col-3,ui-grid-col-2,ui-grid-col-2,ui-grid-col-2,ui-grid-col-3" layout="grid"
+    										 	styleClass="ui-panelgrid-blank">												
+												<h:panelGroup id="pgEmail">
+													<p:outputLabel value="Email: "  />
+													<p:inputText id="email" placeholder=""
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.email}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpEstadoCivil">
+													<p:outputLabel value="Estado Civil: " />
+													<p:selectOneMenu id="mpEstadoCivil" effect="fold"
+														style="background-color:black; color:yellow;"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpEstadoCivil}">
+														<f:selectItem itemLabel="Selecione a opção..." />
+														<f:selectItems
+															value="#{mpClienteConsignadoController.mpEstadoCivilList}"
+															var="mpEstadoCivil" itemValue="#{mpEstadoCivil}"
+															itemLabel="#{mpEstadoCivil.descricao}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgNomeConjuge">
+													<p:outputLabel value="Nome Conjuge: " />
+													<p:inputText id="nomeConjuge" placeholder=""
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar Nome Conjuge"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.nomeConjuge}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgNomeMae">
+													<p:outputLabel value="Nome Mãe: " />
+													<p:inputText id="nomeMae" placeholder=""
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar Nome Mãe"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.nomeMae}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgNomePai">
+													<p:outputLabel value="Nome Pai: " />
+													<p:inputText id="nomePai" placeholder=""
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar Nome Pai"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.nomePai}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgCidadeNaturalidade">
+													<p:outputLabel value="Naturalidade(Cidade): " />
+													<p:inputText id="cidadeNaturalidade" placeholder="" size="20"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar Naturalidade(Cidade)"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.cidadeNaturalidade}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpEstadoUFNat">
+													<p:outputLabel value="UF: " />
+													<p:spacer width="60%" height="10" />
+													<p:selectOneMenu id="mpEstadoUFNat" effect="fold" style="width:50%"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar a UF"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpEstadoUFNaturalidade}">
+														<f:selectItem itemLabel="Selecione..." />
+														<f:selectItems
+															value="#{mpClienteConsignadoController.mpEstadoUFList}"
+															var="mpEstadoUFNat" itemLabel="#{mpEstadoUFNat}"
+															itemValue="#{mpEstadoUFNat}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												
+												<h:panelGroup id="pgMpSexo">
+													<p:outputLabel value="Sexo: " />
+													<p:spacer width="60%" height="10" />
+													<p:selectOneMenu id="mpSexo" effect="fold" style="width:70%"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpSexo}">
+														<f:selectItem itemLabel="Selecione a opção..." />
+														<f:selectItems
+															value="#{mpClienteConsignadoController.mpSexoList}"
+															var="mpSexo" itemLabel="#{mpSexo.descricao}"
+															itemValue="#{mpSexo}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpStatus">
+													<p:outputLabel value="Status: "  />
+													<p:spacer width="60%" height="10" />
+													<p:selectOneMenu id="mpStatus" effect="fold" style="width:70%"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpStatus}">
+														<f:selectItem itemLabel="Selecione a opção..." />
+														<f:selectItems
+															value="#{mpClienteConsignadoController.mpStatusList}"
+															var="mpStatus" itemLabel="#{mpStatus.descricao}"
+															itemValue="#{mpStatus}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup />
+											</p:panelGrid>
+										
+										<!-- /p:panel> -->
+									</p:panelGrid>
+
+    								<p:panelGrid columns="1" columnClasses="ui-grid-col-12" layout="grid"
+    									styleClass="ui-panelgrid-blank">
+
+    						 			<p:panelGrid columns="7" layout="grid" styleClass="ui-panelgrid-blank"
+    										columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-1, ui-grid-col-2, ui-grid-col-2 ,ui-grid-col-2, ui-grid-col-1">  
+											<h:panelGroup id="pgMpConvenio">
+												<p:outputLabel value="Convênio: ( #{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.numeroConvenio} )" />
+												<p:selectOneMenu id="mpConvenio" effect="fold" style="width:70%"
+													converter="omnifaces.SelectItemsConverter"
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Convenio"
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenio}">
+													<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+													<f:selectItems value="#{mpClienteConsignadoController.mpConvenioList}"
+														var="mpConvenio" itemLabel="#{mpConvenio.descricao}"
+														itemValue="#{mpConvenio}" />
+												</p:selectOneMenu>
+												<p:commandButton icon="ui-icon-circle-arrow-e" title="Valor Convênio(1)..."
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													oncomplete="PF('wvdlogConvenio').show()" process="@this"
+													update=":frmCC:dlogConvenio" style="width:25%" />
+											</h:panelGroup>
+											<h:panelGroup id="pgMpEspecieBeneficio">
+												<p:outputLabel value="Espécie Benefício: " />
+												<p:selectOneMenu id="mpEspecieBeneficio" effect="fold" style="width:95%"
+													converter="omnifaces.SelectItemsConverter"
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Espécie Benefício"
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpEspecieBeneficio}">
+													<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+													<f:selectItems value="#{mpClienteConsignadoController.mpEspecieBeneficioList}"
+														var="mpEspecieBeneficio" itemLabel="#{mpEspecieBeneficio.descricao}"
+														itemValue="#{mpEspecieBeneficio}" />
+												</p:selectOneMenu>
+											</h:panelGroup>
+											<h:panelGroup id="pgMpBeneficioUF">
+												<p:outputLabel value="UF: " />
+												<p:spacer width="40%" height="10" />
+												<p:selectOneMenu id="mpBeneficioUF" effect="fold" style="width:90%"
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar a UF"
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenioEstadoUF}">
+													<f:selectItem itemLabel="Selecione..." />
+													<f:selectItems value="#{mpClienteConsignadoController.mpEstadoUFList}"
+														var="mpEstadoBenUF" itemLabel="#{mpEstadoBenUF}" itemValue="#{mpEstadoBenUF}" />
+													</p:selectOneMenu>
+											</h:panelGroup>
+											<h:panelGroup id="pgBeneficioMatricula">
+												<p:outputLabel value="Benefício/Matrícula: " />
+												<p:inputText id="beneficioMatricula" placeholder="" style="width:65%"
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Benefício/Matrícula"
+													readonly="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.beneficioMatricula}" />
+											</h:panelGroup>
+											<h:panelGroup id="pgSenha">
+												<p:outputLabel value="Senha: " />
+												<p:inputText id="senha" placeholder=""
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Instituidor"
+													readonly="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.senha}" />
+											</h:panelGroup>
+											<h:panelGroup id="pgMpOrgaoConvenio">
+												<p:outputLabel value="Orgão: " />
+												<p:spacer width="60%" height="10" />
+												<p:selectOneMenu id="mpOrgaoConvenio" effect="fold" style="width:70%"
+													converter="omnifaces.SelectItemsConverter"
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Orgão"
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpOrgaoConvenio}">
+													<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+													<f:selectItems value="#{mpClienteConsignadoController.mpOrgaoConvenioList}"
+														var="mpOrgaoConvenio" itemLabel="#{mpOrgaoConvenio.descricao}"
+														itemValue="#{mpOrgaoConvenio}" />
+												</p:selectOneMenu>
+											</h:panelGroup>
+											<h:panelGroup id="pgInstituidor">
+												<p:outputLabel value="Instituidor:" />
+												<p:inputText id="instituidor" placeholder=""
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Instituidor"
+													readonly="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.instituidor}" />
+											</h:panelGroup>
+										</p:panelGrid>
+    									<p:panelGrid columns="4" layout="grid"
+    										columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"  
+    										styleClass="ui-panelgrid-blank">
+											<h:panelGroup id="pgMpBanco">
+												<p:outputLabel value="Banco: " />
+												<p:spacer width="60%" height="10" />
+												<p:selectOneMenu id="mpBanco" effect="fold" style="width:60%"
+													converter="omnifaces.SelectItemsConverter"
+														required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Banco"
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpBanco}">
+													<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+													<f:selectItems
+														value="#{mpClienteConsignadoController.mpBancoList}"
+														var="mpBanco" itemLabel="#{mpBanco.descricao}"
+														itemValue="#{mpBanco}" />
+												</p:selectOneMenu>
+											</h:panelGroup>
+											<h:panelGroup id="pgAgenciaConta">
+												<p:outputLabel value="Agência/Conta: " />
+												<p:spacer width="50%" height="10" />
+												<p:inputText id="agencia" placeholder="" style="width:25%"
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Agência"
+													readonly="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.agencia}" />
+												<p:inputText id="conta" placeholder="" style="width:50%"
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Conta"
+													readonly="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.conta}" />
+											</h:panelGroup>
+											<h:panelGroup id="pgMpTipoConta">
+												<p:outputLabel value="Tipo Conta: " />
+												<p:spacer width="60%" height="10" />
+												<p:selectOneMenu id="mpTipoConta" effect="fold" style="width:60%"
+													converter="omnifaces.SelectItemsConverter"
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Tipo Conta"
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpTipoConta}">
+													<f:selectItem itemLabel="Selecione..." itemValue="" />
+													<f:selectItems value="#{mpClienteConsignadoController.mpTipoContaList}"
+														var="mpTipoConta" itemLabel="#{mpTipoConta.descricao}"
+														itemValue="#{mpTipoConta}" />
+													</p:selectOneMenu>
+											</h:panelGroup>
+											<h:panelGroup id="pgMpContaTipo">
+												<p:outputLabel value="Tipo: " />
+												<p:spacer width="60%" height="10" />
+												<p:selectOneMenu id="mpContaTipo" effect="fold" style="width:70%"
+													converter="omnifaces.SelectItemsConverter"
+													required="#{mpClienteConsignadoController.indEditavel}"
+													validatorMessage="Informar Tipo"
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpContaTipo}">
+													<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+													<f:selectItems value="#{mpClienteConsignadoController.mpContaTipoList}"
+														var="mpContaTipo" itemLabel="#{mpContaTipo.descricao}"
+														itemValue="#{mpContaTipo}" />
+												</p:selectOneMenu>
+											</h:panelGroup>
+										</p:panelGrid>
+
+										<h:panelGroup id="xpgMpConvenio1"
+											rendered="#{!mpClienteConsignadoController.indEditavel or (mpClienteConsignadoController.indEditavel and mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.numeroConvenio > 1)}">
+	    						 			<p:panelGrid columns="7" layout="grid" styleClass="ui-panelgrid-blank"
+	    										columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-1, ui-grid-col-2, ui-grid-col-2 ,ui-grid-col-2, ui-grid-col-1">  
+	
+												<h:panelGroup id="pgMpConvenio1">
+													<p:selectOneMenu id="mpConvenio1" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenio1}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpConvenioList}"
+															var="mpConvenio" itemLabel="#{mpConvenio.descricao}" itemValue="#{mpConvenio}" />
+													</p:selectOneMenu>
+													<p:commandButton icon="ui-icon-circle-arrow-e" title="Valor Convênio(2)..."
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														oncomplete="PF('wvdlogConvenio1').show()" process="@this"
+														update=":frmCC:dlogConvenio1" style="width:25%" />												
+												</h:panelGroup>
+												<h:panelGroup id="pgMpEspecieBeneficio1">
+													<p:selectOneMenu id="mpEspecieBeneficio1" effect="fold" style="width:95%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpEspecieBeneficio1}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpEspecieBeneficioList}"
+															var="mpEspecieBeneficio" itemLabel="#{mpEspecieBeneficio.descricao}" 
+															itemValue="#{mpEspecieBeneficio}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpBeneficioUF1">
+													<p:selectOneMenu id="mpBeneficioUF1" effect="fold" style="width:90%"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar a UF"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenioEstadoUF1}">
+														<f:selectItem itemLabel="Selecione..." />
+														<f:selectItems value="#{mpClienteConsignadoController.mpEstadoUFList}"
+															var="mpEstadoBenUF" itemLabel="#{mpEstadoBenUF}"
+															itemValue="#{mpEstadoBenUF}" />
+													</p:selectOneMenu>
+												</h:panelGroup>										
+												<h:panelGroup id="pgBeneficioMatricula1">
+													<p:inputText id="beneficioMatricula1" placeholder="" style="width:65%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.beneficioMatricula1}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgSenha1">
+													<p:inputText id="senha1" placeholder=""
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.senha1}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpOrgaoConvenio1">
+													<p:selectOneMenu id="mpOrgaoConvenio1" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpOrgaoConvenio1}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpOrgaoConvenioList}"
+															var="mpOrgaoConvenio" itemLabel="#{mpOrgaoConvenio.descricao}"
+															itemValue="#{mpOrgaoConvenio}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgInstituidor1">
+													<p:inputText id="instituidor1" placeholder=""
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.instituidor1}" />
+												</h:panelGroup>
+											</p:panelGrid>
+											
+	    									<p:panelGrid columns="4" layout="grid"
+	    										columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"  
+	    										styleClass="ui-panelgrid-blank">
+												<h:panelGroup id="pgMpBanco1">
+													<p:selectOneMenu id="mpBanco1" effect="fold" style="width:60%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpBanco1}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpBancoList}"
+															var="mpBanco1" itemLabel="#{mpBanco1.descricao}"
+															itemValue="#{mpBanco1}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgAgenciaConta1">
+													<p:inputText id="agencia1" placeholder="" style="width:25%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.agencia1}" />
+													<p:inputText id="conta1" placeholder="" style="width:50%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.conta1}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpTipoConta1">
+													<p:selectOneMenu id="mpTipoConta1" effect="fold" style="width:60%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpTipoConta1}">
+														<f:selectItem itemLabel="Selecione..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpTipoContaList}"
+															var="mpTipoConta1" itemLabel="#{mpTipoConta1.descricao}"
+															itemValue="#{mpTipoConta1}" />
+														</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpContaTipo1">
+													<p:selectOneMenu id="mpContaTipo1" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpContaTipo1}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpContaTipoList}"
+															var="mpContaTipo1" itemLabel="#{mpContaTipo1.descricao}"
+															itemValue="#{mpContaTipo1}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+											</p:panelGrid>
+										</h:panelGroup>
+
+										<h:panelGroup id="xpgMpConvenio2"
+											rendered="#{!mpClienteConsignadoController.indEditavel or (mpClienteConsignadoController.indEditavel and mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.numeroConvenio > 2)}">
+	    						 			<p:panelGrid columns="7" layout="grid" styleClass="ui-panelgrid-blank"
+	    										columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-1, ui-grid-col-2, ui-grid-col-2 ,ui-grid-col-2, ui-grid-col-1">  
+												<h:panelGroup id="pgMpConvenio2">
+													<p:selectOneMenu id="mpConvenio2" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenio2}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpConvenioList}"
+															var="mpConvenio" itemLabel="#{mpConvenio.descricao}"
+															itemValue="#{mpConvenio}" />
+													</p:selectOneMenu>
+													<p:commandButton icon="ui-icon-circle-arrow-e" title="Valor Convênio(3)..."
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														oncomplete="PF('wvdlogConvenio2').show()" process="@this"
+														update=":frmCC:dlogConvenio2" style="width:25%" />												
+												</h:panelGroup>
+												<h:panelGroup id="pgMpEspecieBeneficio2">
+													<p:selectOneMenu id="mpEspecieBeneficio2" effect="fold" style="width:95%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpEspecieBeneficio2}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpEspecieBeneficioList}"
+															var="mpEspecieBeneficio" itemLabel="#{mpEspecieBeneficio.descricao}"
+															itemValue="#{mpEspecieBeneficio}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpBeneficioUF2">
+													<p:selectOneMenu id="mpBeneficioUF2" effect="fold" style="width:90%"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar a UF"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenioEstadoUF2}">
+														<f:selectItem itemLabel="Selecione..." />
+														<f:selectItems value="#{mpClienteConsignadoController.mpEstadoUFList}"
+															var="mpEstadoBenUF" itemLabel="#{mpEstadoBenUF}"
+															itemValue="#{mpEstadoBenUF}" />
+													</p:selectOneMenu>
+												</h:panelGroup>												
+												<h:panelGroup id="pgBeneficioMatricula2">
+													<p:inputText id="beneficioMatricula2" placeholder="" style="width:65%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.beneficioMatricula2}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgSenha2">
+													<p:inputText id="senha2" placeholder=""
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.senha2}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpOrgaoConvenio2">
+													<p:selectOneMenu id="mpOrgaoConvenio2" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpOrgaoConvenio2}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpOrgaoConvenioList}"
+															var="mpOrgaoConvenio" itemLabel="#{mpOrgaoConvenio.descricao}"
+																itemValue="#{mpOrgaoConvenio}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgInstituidor2">
+													<p:inputText id="instituidor2" placeholder=""
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.instituidor2}" />
+												</h:panelGroup>
+											</p:panelGrid>
+
+	    									<p:panelGrid columns="4" layout="grid"
+	    										columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"  
+	    										styleClass="ui-panelgrid-blank">
+												<h:panelGroup id="pgMpBanco2">
+													<p:selectOneMenu id="mpBanco2" effect="fold" style="width:60%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpBanco2}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpBancoList}"
+															var="mpBanco2" itemLabel="#{mpBanco2.descricao}"
+															itemValue="#{mpBanco2}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgAgenciaConta2">
+													<p:inputText id="agencia2" placeholder="" style="width:25%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.agencia2}" />
+													<p:inputText id="conta2" placeholder="" style="width:50%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.conta2}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpTipoConta2">
+													<p:selectOneMenu id="mpTipoConta2" effect="fold" style="width:60%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpTipoConta2}">
+														<f:selectItem itemLabel="Selecione..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpTipoContaList}"
+															var="mpTipoConta2" itemLabel="#{mpTipoConta2.descricao}"
+															itemValue="#{mpTipoConta2}" />
+														</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpContaTipo2">
+													<p:selectOneMenu id="mpContaTipo2" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpContaTipo2}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpContaTipoList}"
+															var="mpContaTipo2" itemLabel="#{mpContaTipo2.descricao}"
+															itemValue="#{mpContaTipo2}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+											</p:panelGrid>
+										</h:panelGroup>
+												  
+										<h:panelGroup id="xpgMpConvenio3"
+											rendered="#{!mpClienteConsignadoController.indEditavel or (mpClienteConsignadoController.indEditavel and mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.numeroConvenio > 3)}">
+	    						 			<p:panelGrid columns="7" layout="grid" styleClass="ui-panelgrid-blank"
+	    										columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-1, ui-grid-col-2, ui-grid-col-2 ,ui-grid-col-2, ui-grid-col-1">  
+												<h:panelGroup id="pgMpConvenio3">
+													<p:selectOneMenu id="mpConvenio3" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenio3}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpConvenioList}"
+															var="mpConvenio" itemLabel="#{mpConvenio.descricao}" itemValue="#{mpConvenio}" />
+													</p:selectOneMenu>
+													<p:commandButton icon="ui-icon-circle-arrow-e" title="Valor Convênio(4)..."
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														oncomplete="PF('wvdlogConvenio3').show()" process="@this"
+														update=":frmCC:dlogConvenio3" style="width:25%" />												
+												</h:panelGroup>
+												<h:panelGroup id="pgMpEspecieBeneficio3">
+													<p:selectOneMenu id="mpEspecieBeneficio3" effect="fold" style="width:95%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpEspecieBeneficio3}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpEspecieBeneficioList}"
+															var="mpEspecieBeneficio" itemLabel="#{mpEspecieBeneficio.descricao}"
+															itemValue="#{mpEspecieBeneficio}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpBeneficioUF3">
+													<p:selectOneMenu id="mpBeneficioUF3" effect="fold" style="width:90%"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar a UF"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenioEstadoUF3}">
+														<f:selectItem itemLabel="Selecione..." />
+														<f:selectItems value="#{mpClienteConsignadoController.mpEstadoUFList}"
+															var="mpEstadoBenUF" itemLabel="#{mpEstadoBenUF}"
+															itemValue="#{mpEstadoBenUF}" />
+													</p:selectOneMenu>
+												</h:panelGroup>												
+												<h:panelGroup id="pgBeneficioMatricula3">
+													<p:inputText id="beneficioMatricula3" placeholder="" style="width:65%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.beneficioMatricula3}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgSenha3">
+													<p:inputText id="senha3" placeholder=""
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.senha3}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpOrgaoConvenio3">
+													<p:selectOneMenu id="mpOrgaoConvenio3" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpOrgaoConvenio3}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpOrgaoConvenioList}"
+															var="mpOrgaoConvenio" itemLabel="#{mpOrgaoConvenio.descricao}"
+															itemValue="#{mpOrgaoConvenio}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgInstituidor3">
+													<p:inputText id="instituidor3" placeholder=""
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.instituidor3}" />
+												</h:panelGroup>
+											</p:panelGrid>
+											
+	    									<p:panelGrid columns="4" layout="grid"
+	    										columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"  
+	    										styleClass="ui-panelgrid-blank">
+												<h:panelGroup id="pgMpBanco3">
+													<p:selectOneMenu id="mpBanco3" effect="fold" style="width:60%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpBanco3}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpBancoList}"
+															var="mpBanco3" itemLabel="#{mpBanco3.descricao}"
+															itemValue="#{mpBanco3}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgAgenciaConta3">
+													<p:inputText id="agencia3" placeholder="" style="width:25%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.agencia3}" />
+													<p:inputText id="conta3" placeholder="" style="width:50%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.conta3}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpTipoConta3">
+													<p:selectOneMenu id="mpTipoConta3" effect="fold" style="width:60%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpTipoConta3}">
+														<f:selectItem itemLabel="Selecione..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpTipoContaList}"
+															var="mpTipoConta3" itemLabel="#{mpTipoConta3.descricao}"
+															itemValue="#{mpTipoConta3}" />
+														</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpContaTipo3">
+													<p:selectOneMenu id="mpContaTipo3" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpContaTipo3}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpContaTipoList}"
+															var="mpContaTipo3" itemLabel="#{mpContaTipo3.descricao}"
+															itemValue="#{mpContaTipo3}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+											</p:panelGrid>
+										</h:panelGroup>
+	
+										<h:panelGroup id="xpgMpConvenio4"
+											rendered="#{!mpClienteConsignadoController.indEditavel or (mpClienteConsignadoController.indEditavel and mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.numeroConvenio > 4)}">
+	    						 			<p:panelGrid columns="7" layout="grid" styleClass="ui-panelgrid-blank"
+	    										columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-1, ui-grid-col-2, ui-grid-col-2 ,ui-grid-col-2, ui-grid-col-1">  
+												<h:panelGroup id="pgMpConvenio4">
+													<p:selectOneMenu id="mpConvenio4" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenio4}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpConvenioList}"
+															var="mpConvenio" itemLabel="#{mpConvenio.descricao}" itemValue="#{mpConvenio}" />
+													</p:selectOneMenu>
+													<p:commandButton icon="ui-icon-circle-arrow-e" title="Valor Convênio(5)..."
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														oncomplete="PF('wvdlogConvenio4').show()" process="@this"
+														update=":frmCC:dlogConvenio4" style="width:25%" />												
+												</h:panelGroup>
+												<h:panelGroup id="pgMpEspecieBeneficio4">
+													<p:selectOneMenu id="mpEspecieBeneficio4" effect="fold" style="width:95%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpEspecieBeneficio4}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpEspecieBeneficioList}"
+															var="mpEspecieBeneficio" itemLabel="#{mpEspecieBeneficio.descricao}"
+															itemValue="#{mpEspecieBeneficio}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpBeneficioUF4">
+													<p:selectOneMenu id="mpBeneficioUF4" effect="fold" style="width:90%"
+														required="#{mpClienteConsignadoController.indEditavel}"
+														validatorMessage="Informar a UF"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpConvenioEstadoUF4}">
+														<f:selectItem itemLabel="Selecione..." />
+														<f:selectItems value="#{mpClienteConsignadoController.mpEstadoUFList}"
+																var="mpEstadoBenUF" itemLabel="#{mpEstadoBenUF}"
+																itemValue="#{mpEstadoBenUF}" />
+													</p:selectOneMenu>
+												</h:panelGroup>						
+												<h:panelGroup id="pgBeneficioMatricula4">
+													<p:inputText id="beneficioMatricula4" placeholder="" style="width:65%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.beneficioMatricula4}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgSenha4">
+													<p:inputText id="senha4" placeholder=""
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.senha4}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpOrgaoConvenio4">
+													<p:selectOneMenu id="mpOrgaoConvenio4" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.mpOrgaoConvenio4}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpOrgaoConvenioList}"
+															var="mpOrgaoConvenio" itemLabel="#{mpOrgaoConvenio.descricao}"
+															itemValue="#{mpOrgaoConvenio}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgInstituidor4">
+													<p:inputText id="instituidor4" placeholder=""
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.instituidor4}" />
+												</h:panelGroup>
+											</p:panelGrid>
+											
+	    									<p:panelGrid columns="4" layout="grid"
+	    										columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"  
+	    										styleClass="ui-panelgrid-blank">
+												<h:panelGroup id="pgMpBanco4">
+													<p:selectOneMenu id="mpBanco4" effect="fold" style="width:60%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpBanco4}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpBancoList}"
+															var="mpBanco4" itemLabel="#{mpBanco4.descricao}"
+															itemValue="#{mpBanco4}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgAgenciaConta4">
+													<p:inputText id="agencia4" placeholder="" style="width:25%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.agencia4}" />
+													<p:inputText id="conta4" placeholder="" style="width:50%"
+														readonly="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.conta4}" />
+												</h:panelGroup>
+												<h:panelGroup id="pgMpTipoConta4">
+													<p:selectOneMenu id="mpTipoConta4" effect="fold" style="width:60%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpTipoConta4}">
+														<f:selectItem itemLabel="Selecione..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpTipoContaList}"
+															var="mpTipoConta4" itemLabel="#{mpTipoConta4.descricao}"
+															itemValue="#{mpTipoConta4}" />
+														</p:selectOneMenu>
+												</h:panelGroup>
+												<h:panelGroup id="pgMpContaTipo4">
+													<p:selectOneMenu id="mpContaTipo4" effect="fold" style="width:70%"
+														converter="omnifaces.SelectItemsConverter"
+														disabled="#{mpClienteConsignadoController.indEditavel}"
+														value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosBancario.mpContaTipo4}">
+														<f:selectItem itemLabel="Selecione a opção..." itemValue="" />
+														<f:selectItems value="#{mpClienteConsignadoController.mpContaTipoList}"
+															var="mpContaTipo4" itemLabel="#{mpContaTipo4.descricao}"
+															itemValue="#{mpContaTipo4}" />
+													</p:selectOneMenu>
+												</h:panelGroup>
+											</p:panelGrid>
+										</h:panelGroup>
+												
+									</p:panelGrid>
+
+    								<p:panelGrid columns="1" columnClasses="ui-grid-col-12" layout="grid" 
+    									styleClass="ui-panelgrid-blank">
+										<h:panelGroup id="pgObservacao">
+											<p:outputLabel value="Observação: " />
+											<p:inputTextarea id="observacao" placeholder=""
+												maxlength="500" rows="2"
+												readonly="#{mpClienteConsignadoController.indEditavel}"
+												value="#{mpClienteConsignadoController.mpClienteConsignado.observacao}" />
+										</h:panelGroup>
+
+										<h:panelGroup />
+
+									</p:panelGrid>
+									
+    								<p:panelGrid columns="1" columnClasses="ui-grid-col-12" layout="grid" 
+    									styleClass="ui-panelgrid-blank">
+    										
+										<p:commandButton title="Incluir Histórico" icon="ui-icon-document" 
+											action="#{mpClienteConsignadoController.novoClienteObservacao}" 
+											style="width:5%" disabled="#{mpClienteConsignadoController.indEditavel}"
+											update=":frmCC:dlogCapturaObs"
+											oncomplete="PF('wvdlogCapturaObs').show()" process="@this" />
+											
+										<p:dataTable id="dttObsCC" widgetVar="dttObsCC" var="mpClienteObservacao"
+											value="#{mpClienteConsignadoController.mpClienteObservacaoList}"
+											emptyMessage="Nenhum Histórico encontrado!"
+											paginator="true" paginatorAlwaysVisible="false"
+											paginatorPosition="bottom" rows="10">
+
+											<p:column headerText="Ação" colspan="20"
+												style="text-align:center;" exportable="false">
+	
+												<p:commandButton disabled="#{mpClienteConsignadoController.indEditavel}"
+													action="#{mpClienteConsignadoController.alteraClienteObservacao}" 
+													update=":frmCC:dlogCapturaObs" style="width:30%"
+													icon="ui-icon-pencil" title="Alterar"
+													oncomplete="PF('wvdlogCapturaObs').show()" process="@this">
+													<f:setPropertyActionListener value="#{mpClienteObservacao}"
+														target="#{mpClienteConsignadoController.mpClienteObservacaoSel}" />
+												</p:commandButton>
+	
+												<p:commandButton icon="ui-icon-trash" title="Excluir" style="width:30%"
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													oncomplete="PF('wvcdlogExclusaoObs').show()" process="@this"
+													update=":frmCC:cdlogExclusaoObs">
+													<f:setPropertyActionListener value="#{mpClienteObservacao}"
+														target="#{mpClienteConsignadoController.mpClienteObservacaoSel}" />
+												</p:commandButton>
+														
+											</p:column>
+	
+											<p:column headerText="Data" colspan="15" 
+												sortBy="#{mpClienteObservacao.dataMovimento}">
+												<h:outputText value="#{mpClienteObservacao.dataMovimento}">
+													<f:convertDateTime pattern="dd/MM/yyyy"
+														timeZone="America/Sao_Paulo" />
+												</h:outputText>
+											</p:column>	
+											<p:column headerText="Observação Histórico" colspan="120">
+												<h:outputText value="#{mpClienteObservacao.observacao}" />
+											</p:column>
+	
+										</p:dataTable>
+									</p:panelGrid>
+
+								   </div>
+								</p:tab>
+
+								<p:tab id="tabCadDigCC" title="Digitalização">
+    								<p:panelGrid columns="1" columnClasses="ui-grid-col-12" layout="grid" 
+    									styleClass="ui-panelgrid-blank">
+    										
+										<p:commandButton title="Incluir DOCUMENTO DIGITAL" icon="ui-icon-document" 
+											action="#{mpClienteConsignadoController.novoDocumento}" style="width:5%"
+											disabled="#{mpClienteConsignadoController.indEditavel}"
+											update=":frmCC:dlogCapturaDoc"
+											oncomplete="PF('wvdlogCapturaDoc').show()" process="@this" />
+											
+										<p:dataTable id="dttDocCC" widgetVar="dttDocCC" var="mpDocumentoDigital"
+											value="#{mpClienteConsignadoController.mpDocumentoDigitalList}"
+											emptyMessage="Nenhum Documento Digital encontrado!"
+											paginator="true" paginatorAlwaysVisible="false"
+											paginatorPosition="bottom" rows="10">
+
+											<p:column headerText="Ação"
+												style="text-align:center;" exportable="false">
+	
+												<p:commandButton disabled="#{mpClienteConsignadoController.indEditavel}"
+													action="#{mpClienteConsignadoController.alteraDocumento}" 
+													update=":frmCC:dlogCapturaDoc"
+													icon="ui-icon-pencil" title="Alterar"
+													oncomplete="PF('wvdlogCapturaDoc').show()" process="@this">
+													<f:setPropertyActionListener value="#{mpDocumentoDigital}"
+														target="#{mpClienteConsignadoController.mpDocumentoDigitalSel}" />
+												</p:commandButton>
+	
+												<p:commandButton icon="ui-icon-trash" title="Excluir"
+													disabled="#{mpClienteConsignadoController.indEditavel}"
+													oncomplete="PF('wvcdlogExclusaoDoc').show()" process="@this"
+													update=":frmCC:cdlogExclusaoDoc">
+													<f:setPropertyActionListener value="#{mpDocumentoDigital}"
+														target="#{mpClienteConsignadoController.mpDocumentoDigitalSel}" />
+												</p:commandButton>
+	
+	    										<p:commandButton title="Download" icon="ui-icon-circle-arrow-s"
+	    											rendered="#{!mpDocumentoDigital.arquivoLink.isEmpty()}"
+													disabled="#{mpClienteConsignadoController.indEditavel}" ajax="false"
+	    											onclick="PrimeFaces.monitorDownload(mpStart, mpStop);"> 	
+	        										<p:fileDownload value="#{mpClienteConsignadoController.trataFileDownloadDoc()}" />
+													<f:setPropertyActionListener value="#{mpDocumentoDigital}"
+														target="#{mpClienteConsignadoController.mpDocumentoDigitalSel}" />
+	    										</p:commandButton>							    												
+	
+												<p:commandButton disabled="#{mpClienteConsignadoController.indEditavel}"
+													update=":frmCC:dlogExibeDoc"
+													icon="ui-icon-zoomin" title="Exibir"
+													oncomplete="PF('wvdlogExibeDoc').show()" process="@this">
+													<f:setPropertyActionListener value="#{mpDocumentoDigital}"
+														target="#{mpClienteConsignadoController.mpDocumentoDigitalSel}" />
+												</p:commandButton>
+													
+											</p:column>
+	
+											<p:column headerText="Descrição" sortBy="#{mpDocumentoDigital.descricao}">
+												<h:outputText value="#{mpDocumentoDigital.descricao}" />
+											</p:column>
+	
+										</p:dataTable>
+									</p:panelGrid>
+								</p:tab>
+
+								<p:tab id="tabCadPropCC" title="Proposta">
+									<div class="container">
+										<p:dataTable id="dttPesqPropCC" var="mpProposta"
+											widgetVar="wvdttPesqPropCC"
+											value="#{mpClienteConsignadoController.mpClienteConsignado.mpPropostaList}"
+											emptyMessage="Nenhuma Proposta... encontrada!"
+											filteredValue="#{mpPropostaController.filtroMpPropostaList}"
+											paginator="true" paginatorAlwaysVisible="false"
+											paginatorPosition="bottom" rows="10">
+											
+											<p:column headerText="Ação" style="text-align:center">
+												<p:commandButton title="Seleciona registro" icon="ui-icon-check"
+													action="#{mpClienteConsignadoController.mpView}"
+													process="@this" update="@form"
+													actionListener="#{mpClienteConsignadoController.mpListenerProposta}">
+													<f:attribute name="PropostaSelecionado" value="#{mpProposta}" />
+												</p:commandButton>
+											</p:column>
+
+											<p:column headerText="Número" sortBy="#{mpProposta.getNumeroId()}"
+																			style="text-align:center">
+												<h:outputText value="#{mpProposta.getNumeroId()}" />
+											</p:column>
+											<p:column headerText="Data"
+												sortBy="#{mpProposta.dataMovimento}"
+												filterBy="#{mpProposta.dataMovimento}"
+												filterMatchMode="contains">
+												<h:outputText value="#{mpProposta.dataMovimento}">
+													<f:convertDateTime pattern="dd/MM/yyyy"
+														timeZone="America/Sao_Paulo" />
+												</h:outputText>
+											</p:column>
+											<p:column headerText="CLiente"
+												sortBy="#{mpProposta.mpCLienteConsignado.nome}"
+												filterBy="#{mpProposta.mpClienteConsignado.nome}"
+												filterMatchMode="contains">
+												<h:outputText value="#{mpProposta.mpClienteConsignado.nome}" />
+											</p:column>
+											<p:column headerText="Digitador"
+												sortBy="#{mpProposta.mpDigitador.descricao}"
+												filterBy="#{mpProposta.mpDigitador.descricao}"
+												filterMatchMode="contains">
+												<h:outputText value="#{mpProposta.mpDigitador.descricao}" />
+											</p:column>
+											<p:column headerText="Correspondente"
+												sortBy="#{mpProposta.mpCorrespondente.descricao}"
+												filterBy="#{mpProposta.mpCorrespondente.nome}"
+												filterMatchMode="contains">
+												<h:outputText
+													value="#{mpProposta.mpCorrespondente.descricao}" />
+											</p:column>
+											<p:column headerText="Corretor"
+												sortBy="#{mpProposta.mpCorretor.descricao}"
+												filterBy="#{mpProposta.mpCorretor.descricao}"
+												filterMatchMode="contains">
+												<h:outputText value="#{mpProposta.mpCorretor.descricao}" />
+											</p:column>
+											<p:column headerText="Vendedor"
+												sortBy="#{mpProposta.mpVendedor.descricao}"
+												filterBy="#{mpProposta.mpVendedor.descricao}"
+												filterMatchMode="contains">
+												<h:outputText value="#{mpProposta.mpVendedor.descricao}" />
+											</p:column>
+											<p:column headerText="Margem" sortBy="#{mpProposta.margem}">
+												<h:outputText value="#{mpProposta.margem}" />
+											</p:column>
+											<p:column headerText="Contratos" style="text-align:center" 
+													sortBy="#{mpProposta.mpContratoList.size()}">
+												<h:outputText value="#{mpProposta.mpContratoList.size()}" />
+											</p:column>
+
+										</p:dataTable>
+									</div>
+								</p:tab>
+
+							</p:tabView>
+							
+							<f:facet name="footer">
+								<ui:include src="mpBotoesClienteConsignadoF.xhtml" />
+							</f:facet>
+	
+						</p:panel>
+					</p:tab>
+
+					<p:tab id="tabPesqCC" title="Pesquisa">
+						<div class="container">
+							<p:dataTable id="dttPesqCC" widgetVar="wvdttPesqCC" var="mpClienteConsignado"
+								value="#{mpClienteConsignadoController.mpClienteConsignadoList}"
+								emptyMessage="Nenhum Cliente encontrado!" 
+								filteredValue="#{mpClienteConsignadoController.filtroMpClienteConsignadoList}"
+								paginator="true" paginatorAlwaysVisible="false"
+								paginatorPosition="bottom" rows="15">
+
+								<p:column headerText="Ação" style="text-align:center">
+									<p:commandButton title="Seleciona registro" icon="ui-icon-check"
+										action="#{mpClienteConsignadoController.mpView}"
+										process="@this" update="@form"
+										actionListener="#{mpClienteConsignadoController.mpListener}">
+										<f:attribute name="ClienteConsignadoSelecionado"
+											value="#{mpClienteConsignado}" />
+									</p:commandButton>
+									<p:commandButton title="Exclui registro" icon="ui-icon-trash"
+										oncomplete="PF('wvcdlogExclusaoCC').show()" process="@this"
+										update=":frmCC:tabvCC:cdlogExclusaoCC"
+										actionListener="#{mpClienteConsignadoController.mpListener}">
+										<f:attribute name="ClienteConsignadoSelecionado"
+											value="#{mpClienteConsignado}" />
+									</p:commandButton>
+								</p:column>
+
+								<p:column headerText="Nome" sortBy="#{mpClienteConsignado.nome}"
+									filterBy="#{mpClienteConsignado.nome}"
+									filterMatchMode="contains">
+									<h:outputText value="#{mpClienteConsignado.nome}" />
+								</p:column>
+								<p:column headerText="CPF" sortBy="#{mpClienteConsignado.cpf}"
+									filterBy="#{mpClienteConsignado.cpf}"
+									filterMatchMode="contains" style="text-align:center">
+									<h:outputText value="#{mpClienteConsignado.cpf}" />
+								</p:column>
+								<p:column headerText="Email" sortBy="#{mpClienteConsignado.email}" 
+									priority="5">
+									<h:outputText value="#{mpClienteConsignado.email}" />
+								</p:column>
+								<p:column headerText="Telefone" priority="6" style="text-align:center">
+									<h:outputText value="#{mpClienteConsignado.telefone}" />
+								</p:column>
+								<p:column headerText="Sexo" sortBy="#{mpClienteConsignado.mpSexo.descricao}"
+									style="text-align:center">
+									<h:outputText value="#{mpClienteConsignado.mpSexo.descricao}" />
+								</p:column>
+								<p:column headerText="Status" sortBy="#{mpClienteConsignado.mpStatus.descricao}"
+									filterBy="#{mpClienteConsignado.mpStatus.descricao}"
+									filterMatchMode="contains" style="text-align:center">
+									<h:outputText value="#{mpClienteConsignado.mpStatus}" />
+								</p:column>
+								<p:column headerText="Prospec." sortBy="#{mpClienteConsignado.indProspeccao}"
+									style="text-align:center">
+									<h:outputText value="#{mpClienteConsignado.indProspeccao ? 'Sim' : ' '}" />
+								</p:column>
+								<p:column headerText="Propostas" style="text-align:center">
+									<h:outputText value="#{mpClienteConsignado.mpPropostaList.size()}" />
+								</p:column>
+
+							</p:dataTable>
+						</div>
+					</p:tab>
+
+				</p:tabView>
+				
+			</p:panel>
+
+			<p:dialog id="dlogCapturaCC" widgetVar="wvdlogCapturaCC" modal="true"
+				rendered="#{!mpClienteConsignadoController.indEditavel}"
+				header="Captura Foto" showEffect="fade" hideEffect="fade"
+				resizable="false" responsive="true">
+				<h:form id="frmCapturaDialog">
+					<p:messages id="messageFoto" autoUpdate="false" showDetail="false" />
+					<h:panelGroup >
+						<p:graphicImage width="30%" 
+							rendered="#{mpClienteConsignadoController.mpClienteConsignado.fotoLink == null ? false : true}"
+							library="static" name="images/fotos/cliente_consignado_#{mpClienteConsignadoController.mpClienteConsignado.fotoLink}.jpeg" />
+		        		<h:graphicImage width="30%" library="static" name="images/userBlank.jpg"  
+							rendered="#{mpClienteConsignadoController.mpClienteConsignado.fotoLink == null ? true : false}" />
+						<h:outputText value="#{mpClienteConsignado.mpClienteConsignado.fotoLink}"
+							rendered="#{mpClienteConsignadoController.mpClienteConsignado.fotoLink == null ? false : true}" />
+					</h:panelGroup>
+					<h:panelGroup >
+						<p:fileUpload label="Selecionar..."
+							fileUploadListener="#{mpClienteConsignadoController.handleFileUpload}"
+							auto="true" mode="advanced" dragDropSupport="true"
+							sizeLimit="5000000" update="photoDialog :frmCC:tabvCC:tabvCadCC:pgFoto messageFoto"
+							allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+					</h:panelGroup>
+									
+					<h:panelGrid columns="3" cellpadding="5">
+						<p:outputPanel id="photoDialog">
+            				<p:graphicImage width="100" height="100" library="static"
+            				 	name="images/fotos/cliente_consignado_#{mpClienteConsignadoController.mpClienteConsignado.fotoLink}.jpeg" 
+            					rendered="#{not empty mpClienteConsignadoController.mpClienteConsignado.fotoLink}"/>
+						</p:outputPanel>
+					</h:panelGrid>
+				</h:form>
+			</p:dialog>
+
+			<p:dialog id="dlogCapturaDoc" widgetVar="wvdlogCapturaDoc"
+				header="Documento Digitalização : #{mpClienteConsignadoController.txtModoDoc}" modal="true"
+        		width="450" height="200" contentWidth="100%"  contentHeight="100%"
+			 	showEffect="fade" hideEffect="fade" resizable="false" responsive="true">
+
+				<h:form id="frmCapturaDocDialog">
+					<p:messages id="messageDoc" autoUpdate="false" showDetail="false" />
+			 		
+				 	<h:panelGroup id="pgDocDescricao">
+						<p:outputLabel value="Descrição: " />
+						<p:inputText id="docDescricao" placeholder="" 	maxlength="255"
+							readonly="#{mpClienteConsignadoController.indEditavel}"
+							value="#{mpClienteConsignadoController.mpDocumentoDigitalSel.descricao}" />
+					</h:panelGroup>
+				 	<h:panelGroup id="pgDocLink">
+						<p:outputLabel value="Link: " />
+						<p:outputLabel value="#{mpClienteConsignadoController.mpDocumentoDigitalSel.arquivoLink}" />
+					</h:panelGroup>
+
+					<h:panelGroup >
+						<p:fileUpload label="Selecionar..." icon="ui-icon-circle-arrow-n"
+							fileUploadListener="#{mpClienteConsignadoController.handleFileUploadDoc}"
+							auto="true" mode="advanced" dragDropSupport="true" process="@this"
+							update=":frmCC:tabvCC:tabvCadCC:dttDocCC messageDoc pgDocDescricao pgDocLink"
+							sizeLimit="5000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+					</h:panelGroup>
+
+				 	<h:panelGroup>
+						<p:commandButton title="Gravar Documento" icon="ui-icon-disk"
+							action="#{mpClienteConsignadoController.gravaDocumento}" process="@form" 
+							update=":frmCC:tabvCC:tabvCadCC:dttDocCC messageDoc" />
+						<p:commandButton title="Fechar Documento" icon="ui-icon-extlink"
+							oncomplete="PF('wvdlogCapturaDoc').hide();" process="@this" />
+					</h:panelGroup>
+				</h:form>			 					 			 		
+			</p:dialog>
+			
+			<p:confirmDialog id="cdlogExclusaoDoc" widgetVar="wvcdlogExclusaoDoc"	 
+				header="Exclusão do #{mpClienteConsignadoController.mpDocumentoDigitalSel.descricao}" 
+				responsive="true" global="true" showEffect="fade" hideEffect="fade" message=
+				"Deseja excluir o Documento ( #{mpClienteConsignadoController.mpDocumentoDigitalSel.descricao}?">
+				<p:commandButton value="Não" styleClass="ui-confirmdialog-no"
+					onclick="PF('wvcdlogExclusaoDoc').hide(); return false;" />
+				<p:commandButton value="Sim" update=":frmCC:tabvCC:tabvCadCC:tabCadDigCC" id="yesButtonD"
+					oncomplete="PF('wvcdlogExclusaoDoc').hide();"
+					actionListener="#{mpClienteConsignadoController.deleteDocumento}" process="@this"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			</p:confirmDialog>
+
+			<p:dialog id="dlogExibeDoc" widgetVar="wvdlogExibeDoc"
+				header="Exibe Documento" modal="true"
+        		width="450" height="300" contentWidth="100%"  contentHeight="100%"
+			 	showEffect="fade" hideEffect="fade" resizable="false" responsive="true">
+
+				<p:graphicImage style="width:40%" library="static"
+					name="images/arquivos/cliente_consignado_#{mpClienteConsignadoController.mpDocumentoDigitalSel.arquivoLink}.jpeg"
+					rendered="#{mpClienteConsignadoController.mpDocumentoDigitalSel.arquivoLink == null ? false : true}" />
+
+			</p:dialog>
+
+			<p:dialog id="dlogCapturaObs" widgetVar="wvdlogCapturaObs"
+				header="Histórico Observação : #{mpClienteConsignadoController.txtModoObs}" modal="true"
+        		width="70%" height="20%" showEffect="fade" hideEffect="fade" resizable="false" responsive="true">
+
+				<h:form id="frmCapturaObsDialog">
+					<p:messages id="messageObs" autoUpdate="false" showDetail="false" />
+			 		
+    				<p:panelGrid columns="3" columnClasses="ui-grid-col-3, ui-grid-col-1, ui-grid-col-8" 
+    						layout="grid" styleClass="ui-panelgrid-blank">
+					 	<h:panelGroup id="pgObsData">
+							<p:outputLabel for="dataMovimento" value="Data: " />
+							<p:calendar id="dataMovimento" showOn="button" pattern="dd/MM/yyyy" mask="true"
+								locale="pt" timeZone="America/Sao_Paulo" style="width:80%" placeholder="__/__/____"
+								value="#{mpClienteConsignadoController.mpClienteObservacaoSel.dataMovimento}" />
+						</h:panelGroup>
+						<h:panelGroup />			 		
+				 		<h:panelGroup id="pgObsObservacao">
+							<p:outputLabel value="Observação: " />
+							<p:inputTextarea id="obsObervacao" placeholder="" maxlength="400" style="width:100%" rows="2"
+								readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteObservacaoSel.observacao}" />
+						</h:panelGroup>
+					</p:panelGrid>
+
+    				<p:panelGrid columns="3" columnClasses="ui-grid-col-4,ui-grid-col-6,ui-grid-col-2" layout="grid" 
+    						styleClass="ui-panelgrid-blank">
+				 		<h:panelGroup />
+				 		<h:panelGroup />
+				 		<h:panelGroup>
+							<p:commandButton title="Gravar Histórico" icon="ui-icon-disk"
+								action="#{mpClienteConsignadoController.gravaClienteObservacao}" process="@form" 
+								update=":frmCC:tabvCC:tabvCadCC:dttObsCC messageObs" />
+							<p:commandButton title="Fechar Histórico" icon="ui-icon-extlink"
+								oncomplete="PF('wvdlogCapturaObs').hide();" process="@this" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</h:form>			 					 			 		
+			</p:dialog>
+			
+			<p:confirmDialog id="cdlogExclusaoObs" widgetVar="wvcdlogExclusaoObs"	 
+				header="Exclusão do #{mpClienteConsignadoController.mpClienteObservacaoSel.dataMovimentoSDF}" 
+				responsive="true" global="true" showEffect="fade" hideEffect="fade" message=
+				"Deseja excluir o Histórico ( #{mpClienteConsignadoController.mpClienteObservacaoSel.dataMovimentoSDF}?">
+				<p:commandButton value="Não" styleClass="ui-confirmdialog-no"
+					onclick="PF('wvcdlogExclusaoObs').hide(); return false;" />
+				<p:commandButton value="Sim" update=":frmCC:tabvCC:tabvCadCC:dttObsCC" id="yesButtonO"
+					oncomplete="PF('wvcdlogExclusaoObs').hide();"
+					actionListener="#{mpClienteConsignadoController.deleteClienteObservacao}" process="@this"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			</p:confirmDialog>
+
+			<p:dialog id="dlogConvenio" widgetVar="wvdlogConvenio"
+				header=" Valor Convênio(1)..." modal="true"
+        		width="50%" height="20%" showEffect="fade" hideEffect="fade" resizable="false" responsive="true">
+	
+				<h:form id="frmConvenioDialog">
+	    			<p:panelGrid columns="4" columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" 
+	    					layout="grid" styleClass="ui-panelgrid-blank">
+						<h:panelGroup id="pgValorMR">
+							<p:outputLabel value="Valor MR: " />
+							<p:inputText id="valorMR" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorMR}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorIR">
+							<p:outputLabel value="Valor IR: " />
+							<p:inputText id="valorIR" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorIR}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorSeguro">
+							<p:outputLabel value="Valor Seguro: " />
+							<p:inputText id="valorSeguro" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorSeguro}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorPensao">
+							<p:outputLabel value="Valor Pensão: " />
+							<p:inputText id="valorPensao" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorPensao}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+					</p:panelGrid>
+	    			<p:panelGrid columns="3" columnClasses="ui-grid-col-4,ui-grid-col-6,ui-grid-col-2" layout="grid" 
+	    					styleClass="ui-panelgrid-blank">
+					 	<h:panelGroup />
+					 	<h:panelGroup />
+					 	<h:panelGroup>
+							<p:commandButton title="Salvar Valores Convênio..." icon="ui-icon-disk" process="@form" 
+								action="#{mpClienteConsignadoController.gravaClienteConvenioValor}"
+								oncomplete="PF('wvdlogConvenio').hide();" update=":frmCC" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</h:form>
+			</p:dialog>
+
+			<p:dialog id="dlogConvenio1" widgetVar="wvdlogConvenio1"
+				header=" Valor Convênio(2)..." modal="true"
+        		width="50%" height="20%" showEffect="fade" hideEffect="fade" resizable="false" responsive="true">
+
+				<h:form id="frmConvenio1Dialog">
+	    			<p:panelGrid columns="4" columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" 
+	    					layout="grid" styleClass="ui-panelgrid-blank">
+						<h:panelGroup id="pgValorMR1">
+							<p:outputLabel value="Valor MR: " />
+							<p:inputText id="valorMR1" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorMR1}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorIR1">
+							<p:outputLabel value="Valor IR: " />
+							<p:inputText id="valorIR1" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorIR1}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorSeguro1">
+							<p:outputLabel value="Valor Seguro: " />
+							<p:inputText id="valorSeguro1" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorSeguro1}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorPensao1">
+							<p:outputLabel value="Valor Pensão: " />
+							<p:inputText id="valorPensao1" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorPensao1}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+					</p:panelGrid>
+	    			<p:panelGrid columns="3" columnClasses="ui-grid-col-4,ui-grid-col-6,ui-grid-col-2" layout="grid" 
+	    					styleClass="ui-panelgrid-blank">
+					 	<h:panelGroup />
+					 	<h:panelGroup />
+					 	<h:panelGroup>
+							<p:commandButton title="Salvar Valores Convênio..." icon="ui-icon-disk" process="@form" 
+								action="#{mpClienteConsignadoController.gravaClienteConvenioValor}"
+								oncomplete="PF('wvdlogConvenio1').hide();" update=":frmCC" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</h:form>
+			</p:dialog>
+
+			<p:dialog id="dlogConvenio2" widgetVar="wvdlogConvenio2"
+				header=" Valor Convênio(3)..." modal="true"
+        		width="50%" height="20%" showEffect="fade" hideEffect="fade" resizable="false" responsive="true">
+
+				<h:form id="frmConvenio2Dialog">
+	    			<p:panelGrid columns="4" columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" 
+	    					layout="grid" styleClass="ui-panelgrid-blank">
+						<h:panelGroup id="pgValorMR2">
+							<p:outputLabel value="Valor MR: " />
+							<p:inputText id="valorMR2" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorMR2}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorIR2">
+							<p:outputLabel value="Valor IR: " />
+							<p:inputText id="valorIR2" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorIR2}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorSeguro2">
+							<p:outputLabel value="Valor Seguro: " />
+							<p:inputText id="valorSeguro2" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorSeguro2}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorPensao2">
+							<p:outputLabel value="Valor Pensão: " />
+							<p:inputText id="valorPensao2" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorPensao2}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+					</p:panelGrid>
+	    			<p:panelGrid columns="3" columnClasses="ui-grid-col-4,ui-grid-col-6,ui-grid-col-2" layout="grid" 
+	    					styleClass="ui-panelgrid-blank">
+					 	<h:panelGroup />
+					 	<h:panelGroup />
+					 	<h:panelGroup>
+							<p:commandButton title="Salvar Valores Convênio..." icon="ui-icon-disk" process="@form" 
+								action="#{mpClienteConsignadoController.gravaClienteConvenioValor}"
+								oncomplete="PF('wvdlogConvenio2').hide();" update=":frmCC" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</h:form>
+			</p:dialog>
+
+			<p:dialog id="dlogConvenio3" widgetVar="wvdlogConvenio3"
+				header=" Valor Convênio(4)..." modal="true"
+        		width="50%" height="20%" showEffect="fade" hideEffect="fade" resizable="false" responsive="true">
+
+				<h:form id="frmConvenio3Dialog">
+	    			<p:panelGrid columns="4" columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" 
+	    					layout="grid" styleClass="ui-panelgrid-blank">
+						<h:panelGroup id="pgValorMR3">
+							<p:outputLabel value="Valor MR: " />
+							<p:inputText id="valorMR3" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorMR3}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorIR3">
+							<p:outputLabel value="Valor IR: " />
+							<p:inputText id="valorIR3" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorIR3}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorSeguro3">
+							<p:outputLabel value="Valor Seguro: " />
+							<p:inputText id="valorSeguro3" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorSeguro3}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorPensao3">
+							<p:outputLabel value="Valor Pensão: " />
+							<p:inputText id="valorPensao3" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorPensao3}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+					</p:panelGrid>
+	    			<p:panelGrid columns="3" columnClasses="ui-grid-col-4,ui-grid-col-6,ui-grid-col-2" layout="grid" 
+	    					styleClass="ui-panelgrid-blank">
+					 	<h:panelGroup />
+					 	<h:panelGroup />
+					 	<h:panelGroup>
+							<p:commandButton title="Salvar Valores Convênio..." icon="ui-icon-disk" process="@form" 
+								action="#{mpClienteConsignadoController.gravaClienteConvenioValor}"
+								oncomplete="PF('wvdlogConvenio3').hide();" update=":frmCC" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</h:form>
+			</p:dialog>
+
+			<p:dialog id="dlogConvenio4" widgetVar="wvdlogConvenio4"
+				header=" Valor Convênio(5)..." modal="true"
+        		width="50%" height="20%" showEffect="fade" hideEffect="fade" resizable="false" responsive="true">
+
+				<h:form id="frmConvenio4Dialog">
+	    			<p:panelGrid columns="4" columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" 
+	    					layout="grid" styleClass="ui-panelgrid-blank">
+						<h:panelGroup id="pgValorMR4">
+							<p:outputLabel value="Valor MR: " />
+							<p:inputText id="valorMR4" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorMR4}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorIR4">
+							<p:outputLabel value="Valor IR: " />
+							<p:inputText id="valorIR4" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorIR4}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorSeguro4">
+							<p:outputLabel value="Valor Seguro: " />
+							<p:inputText id="valorSeguro4" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorSeguro4}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="pgValorPensao4">
+							<p:outputLabel value="Valor Pensão: " />
+							<p:inputText id="valorPensao4" maxlength="8"
+								styleClass="moeda" readonly="#{mpClienteConsignadoController.indEditavel}"
+								value="#{mpClienteConsignadoController.mpClienteConsignado.mpDadosConvenio.valorPensao4}">
+								<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+							</p:inputText>
+						</h:panelGroup>
+					</p:panelGrid>
+	    			<p:panelGrid columns="3" columnClasses="ui-grid-col-4,ui-grid-col-6,ui-grid-col-2" layout="grid" 
+	    					styleClass="ui-panelgrid-blank">
+					 	<h:panelGroup />
+					 	<h:panelGroup />
+					 	<h:panelGroup>
+							<p:commandButton title="Salvar Valores Convênio..." icon="ui-icon-disk" process="@form" 
+								action="#{mpClienteConsignadoController.gravaClienteConvenioValor}"
+								oncomplete="PF('wvdlogConvenio4').hide();" update=":frmCC" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</h:form>
+			</p:dialog>
+			
+		</h:form>
+
+		<script type="text/javascript">
+			function start() {
+			    PF('statusDialog').show();
+			}
+			 
+			function stop() {
+			    PF('statusDialog').hide();
+			}
+		</script>
+						
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,14 @@
+jsf:
+  primefaces: 
+    theme: omega
+  omnifaces:
+    faces-views-enabled: true
+
+server:
+  port: 8080
+  servlet.context-path: /mpconsig
+   
+spring:
+  h2:
+    console:
+      enabled: true

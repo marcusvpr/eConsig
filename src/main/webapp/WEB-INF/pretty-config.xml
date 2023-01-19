@@ -1,0 +1,71 @@
+<pretty-config xmlns="http://ocpsoft.org/schema/rewrite-config-prettyfaces" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+               xsi:schemaLocation="http://ocpsoft.org/schema/rewrite-config-prettyfaces
+               http://ocpsoft.org/xml/ns/prettyfaces/rewrite-config-prettyfaces.xsd">
+               
+	<url-mapping id="Dashboard">
+		<pattern value="/Dashboard" />
+		<view-id value="/user/mpDashboard.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="Logout">
+		<pattern value="/Logout" />
+		<view-id value="/mpLogout.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="Dolar">
+		<pattern value="/Dolar" />
+		<view-id value="/admin/dolars/mpCadastroDolar.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="TabelaInterna">
+		<pattern value="/TabelaInterna" />
+		<view-id value="/admin/tabelaInternas/mpCadastroTabelaInterna.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="ClienteConsignado">
+		<pattern value="/ClienteConsignado" />
+		<view-id value="/user/clienteConsignados/mpCadastroClienteConsignado.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="Usuario">
+		<pattern value="/Usuario" />
+		<view-id value="/admin/usuarios/mpCadastroUsuario.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="Proposta">
+		<pattern value="/Proposta" />
+		<view-id value="/user/propostas/mpCadastroProposta.xhtml" />
+	</url-mapping>
+		
+	<url-mapping id="RelatorioClienteConsignado">
+		<pattern value="/RelatorioClienteConsignado" />
+		<view-id value="/user/clienteConsignados/MpRelatorioClienteConsignado.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="RelatorioTabelaInterna">
+		<pattern value="/RelatorioTabelaInterna" />
+		<view-id value="/admin/tabelaInternas/MpRelatorioTabelaInterna.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="RelatorioProposta">
+		<pattern value="/RelatorioProposta" />
+		<view-id value="/user/propostas/MpRelatorioProposta.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="Pagamento">
+		<pattern value="/Pagamento" />
+		<view-id value="/user/pagamentos/mpCadastroPagamento.xhtml" />
+	</url-mapping>
+
+	<url-mapping id="404">
+		<pattern value="/404" />
+		<view-id value="/404.html" />
+	</url-mapping>
+
+	<url-mapping id="500">
+		<pattern value="/500" />
+		<view-id value="/500.html" />
+	</url-mapping>
+									
+</pretty-config>
